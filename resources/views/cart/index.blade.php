@@ -3,63 +3,72 @@
 @section('content')
 <x-navbar />
 
-<div class="cart-container">
-    <h1>Carrito de Boletos</h1>
+<div class="container py-5 text-white" style="font-family: 'Lato', sans-serif;">
+    <h2 class="text-center mb-5 fw-bold">Mi Carrito de Compras</h2>
 
-    @if(session('success'))
-        <div class="success-message">{{ session('success') }}</div>
+    @if (session('success'))
+        <div class="alert alert-success text-center">{{ session('success') }}</div>
     @endif
 
-    @if(session('error'))
-        <div class="error-message">{{ session('error') }}</div>
+    @if (session('error'))
+        <div class="alert alert-danger text-center">{{ session('error') }}</div>
     @endif
 
-    @if(count($cart) > 0)
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Evento</th>
-                    <th>Fecha</th>
-                    <th>Precio Unitario</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php $total = 0; @endphp
-                @foreach ($cart as $eventId => $item)
-                    @php $total += $item['price'] * $item['quantity']; @endphp
-                    <tr>
-                        <td>{{ $item['title'] }}</td>
-                        <td>{{ \Carbon\Carbon::parse($item['date'])->format('d/m/y') }}</td>
-                        <td>${{ number_format($item['price'], 2) }}</td>
-                        <td>{{ $item['quantity'] }}</td>
-                        <td>${{ number_format($item['price'] * $item['quantity'], 2) }}</td>
-                        <td>
-                            <form action="{{ route('cart.remove', $eventId) }}" method="POST" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-danger">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+    @if (!empty($cart) && count($cart) > 0)
+        @foreach ($cart as $eventId => $details)
+            @php
+                $event = $events[$eventId] ?? null;
+                $seats = \App\Models\Seat::with('section')->whereIn('id', $details['seats'])->get();
+            @endphp
 
-        <h2>Total a Pagar: ${{ number_format($total, 2) }}</h2>
+            @if ($event)
+            <div class="card bg-dark text-white border-0 mb-4 shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{{ $event->title }}</h4>
+                    <form action="{{ route('cart.remove', $eventId) }}" method="POST">
+                        @csrf
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash-fill"></i> Quitar
+                        </button>
+                    </form>
+                </div>
 
-        <form action="{{ route('payment.checkout') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-success">Pagar con Tarjeta</button>
-        </form>
+                <div class="card-body">
+                    <p class="mb-1"><i class="bi bi-calendar3"></i> {{ $event->fecha_de_inicio }} - {{ $event->fecha_finalizacion }}</p>
+                    <p class="mb-3"><i class="bi bi-geo-alt-fill"></i> {{ $event->place->name ?? 'Ubicación no disponible' }}</p>
 
-        <form action="{{ route('cart.clear') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-warning">Vaciar Carrito</button>
-        </form>
+                    <h6>Asientos Seleccionados:</h6>
+                    <ul class="list-group list-group-flush text-white">
+                        @foreach ($seats as $seat)
+                            <li class="list-group-item bg-transparent border-bottom border-light text-white">
+                                {{ $seat->seat_number }} — {{ $seat->section->name }} (${{ number_format($seat->section->price, 2) }})
+                            </li>
+                        @endforeach
+                    </ul>
+
+                    <div class="mt-3 text-end">
+                        <strong>Total:</strong> ${{ number_format($seats->sum(fn($s) => $s->section->price), 2) }}
+                    </div>
+                </div>
+            </div>
+            @endif
+        @endforeach
+
+        <div class="text-center mt-5">
+            <form action="{{ route('checkout') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-success btn-lg px-5">
+                    <i class="bi bi-credit-card-fill me-1"></i> Finalizar Compra
+                </button>
+            </form>
+        </div>
+
     @else
-        <p>El carrito está vacío.</p>
+        <div class="alert alert-warning text-center">
+            Tu carrito está vacío. ¡Explora nuestros eventos y añade tus boletos favoritos!
+        </div>
     @endif
 </div>
+<x-footer />
+
 @endsection

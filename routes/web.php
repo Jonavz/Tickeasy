@@ -12,6 +12,8 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SectionController;
+use App\Http\Controllers\SeatController;
 use App\Models\Category;
 
 use Illuminate\Support\Facades\View;
@@ -42,6 +44,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/eventos/{event}/editar', [EventController::class, 'edit'])->name('events.edit');
     Route::put('/admin/eventos/{event}', [EventController::class, 'update'])->name('events.update');
     Route::delete('/admin/eventos/{event}', [EventController::class, 'destroy'])->name('events.destroy');
+    Route::get('/secciones/crear', [SectionController::class, 'create'])->name('sections.create');
+    Route::post('/secciones', [SectionController::class, 'store'])->name('sections.store');
+    Route::get('/asientos/crear', [SeatController::class, 'create'])->name('seats.create');
+    Route::post('/asientos', [SeatController::class, 'store'])->name('seats.store');
 });
 
 //Usuario
@@ -75,11 +81,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
 #EVENTO VISTA------------------------
 Route::middleware(['auth'])->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add/{eventId}', [CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/remove/{eventId}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::get('/eventos/{event}', [EventController::class, 'show'])->name('events.show');
+    Route::post('/eventos/{event}/cart', [CartController::class, 'add'])->name('cart.add');
+
 
 });
 
@@ -114,4 +121,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::post('/checkout', [PaymentController::class, 'checkout'])->name('payment.checkout');
     Route::get('/checkout/success', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/carrito', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/checkout', [PaymentController::class, 'checkout'])->name('checkout');
+
 });

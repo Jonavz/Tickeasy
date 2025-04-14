@@ -7,6 +7,10 @@
     <h1>Gestión de Lugares</h1>
     <a href="{{ route('places.create') }}" class="btn btn-primary">Agregar Lugar</a>
 
+    @if(session('success'))
+        <div class="success-message">{{ session('success') }}</div>
+    @endif
+
     <table class="table">
         <thead>
             <tr>

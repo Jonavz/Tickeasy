@@ -17,15 +17,17 @@ class Ticket extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function event()
-    {
-        return $this->belongsTo(Event::class);
-    }
-
+  
     public function getAvailableTicketsAttribute()
 {
     return $this->place ? $this->place->max_capacity - $this->tickets()->sum('quantity') : 0;
 }
+
+public function event()
+{
+    return $this->belongsTo(Event::class);
+}
+
 
 }
 

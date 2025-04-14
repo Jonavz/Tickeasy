@@ -14,6 +14,11 @@ class Place extends Model {
 {
     return $this->hasMany(Event::class, 'place_id');
 }
+public function sections()
+{
+    return $this->hasMany(Section::class);
+}
+
 
 }
 

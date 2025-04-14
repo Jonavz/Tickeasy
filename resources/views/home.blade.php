@@ -7,6 +7,7 @@
 
     <!-- Hero Section -->
     <x-hero-section />
+    <br>
 
     <!-- Sección Descubre -->
     <x-discover-section :randomEvents="$randomEvents" />

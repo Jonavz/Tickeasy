@@ -44,10 +44,16 @@ public function getAvailableTicketsAttribute()
 }
 
 
+public function seats()
+{
+    return $this->hasMany(Seat::class);
+}
+
 public function place()
 {
-    return $this->belongsTo(Place::class, 'place_id');
+    return $this->belongsTo(Place::class);
 }
+
 
 
 }

@@ -1,0 +1,43 @@
+body {
+    background-color: #0e1734; /* fondo oscuro azulado */
+}
+
+h2, .card-title {
+    color: #ffffff;
+}
+
+.card {
+    background-color: #18264d;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.03);
+}
+
+.footer {
+    background-color: #080e2e;
+}
+
+.ticket-section {
+    background-color: #0c1225; /* fondo principal más oscuro */
+    min-height: 100vh;
+}
+
+.ticket-table {
+    background-color: #141c2f; /* tabla ligeramente más clara */
+    border-radius: 12px;
+}
+
+.ticket-header {
+    background-color: #19264b; /* encabezado azul medio */
+    color: #ffffff;
+    font-family: 'Lato', sans-serif;
+}
+
+.ticket-table td,
+.ticket-table th {
+    border-bottom: 1px solid #273352;
+    padding: 16px;
+}
+

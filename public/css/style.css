@@ -77,7 +77,7 @@ html, body {
   border: none;
   cursor: pointer;
   font-size: 16px;
-  color: #CFCFE8;
+  color: #070733;
   padding: 5px 16px;
 }
 .dropdown-content {
@@ -94,7 +94,7 @@ html, body {
 }
 .dropdown-content a,
 .dropdown-content form button {
-  color: #CFCFE8;
+  color: #18184d;
   padding: 10px;
   text-decoration: none;
   display: block;
@@ -362,41 +362,52 @@ html, body {
 
 .hero-section {
     background: url('../img/HOME.png') no-repeat center center/cover;
-    height: 400px;
+    height: 280px; /* ⬅️ Altura reducida */
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: #FFFFFF;
     position: relative;
-  }
+    color: #FFFFFF;
+}
 
-  .hero-overlay {
-    background: rgba(0, 0, 0, 0.5);
-    padding: 20px;
+.hero-overlay {
+    background: rgba(0, 0, 0, 0.5); /* Sombra oscura */
+    padding: 30px 50px;
     border-radius: 10px;
-  }
+}
 
-  .hero-section h1 {
-    font-size: 50px;
-    font-weight: bold;
+.hero-title {
+    font-size: 56px;
+    font-weight: 700;
     font-family: 'Montserrat', sans-serif;
-  }
+    margin-bottom: 10px;
+}
 
-  .hero-section p {
+.hero-subtitle {
     font-size: 20px;
     font-weight: 400;
-  }
-
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+}
 
 /* DISCOVER SECTION */
 .discover-section {
-  padding: 50px;
   text-align: center;
+  flex-direction: row;
+  display: flex;
+  gap: 10px;
+  padding-left: 100px;
+  padding-right: 100px;
+  justify-content: center;
 }
-.discover-section h2 {
+
+.titulo {
   font-size: 28px;
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }
 .event-grid {
   display: grid;
@@ -411,6 +422,8 @@ html, body {
   box-shadow: 0px 4px 8px rgba(0,0,0,0.4);
   overflow: hidden;
   transition: transform  0.2s ease-in-out;
+  width: 350;
+  gap: 30px;
 }
 .event-card:hover {
   transform: scale(1.05);

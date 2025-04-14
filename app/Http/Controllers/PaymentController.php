@@ -7,6 +7,7 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session as StripeSession;
 use App\Models\Ticket;
 use App\Models\Event;
+use App\Models\Seat;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -23,22 +24,27 @@ class PaymentController extends Controller
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $lineItems = [];
+
         foreach ($cart as $eventId => $details) {
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'usd',
-                    'product_data' => [
-                        'name' => $details['title'],
+            $seats = Seat::with('section')->whereIn('id', $details['seats'])->get();
+
+            foreach ($seats as $seat) {
+                $lineItems[] = [
+                    'price_data' => [
+                        'currency' => 'usd',
+                        'product_data' => [
+                            'name' => "Asiento " . $seat->seat_number . " - " . $seat->section->name . " (" . $seat->section->place->name . ")",
+                        ],
+                        'unit_amount' => intval($seat->section->price * 100),
                     ],
-                    'unit_amount' => $details['price'] * 100,
-                ],
-                'quantity' => $details['quantity'],
-            ];
+                    'quantity' => 1,
+                ];
+            }
         }
 
         $session = StripeSession::create([
             'payment_method_types' => ['card'],
-            'line_items' => [$lineItems],
+            'line_items' => $lineItems,
             'mode' => 'payment',
             'success_url' => route('payment.success'),
             'cancel_url' => route('cart.index'),
@@ -56,28 +62,26 @@ class PaymentController extends Controller
         }
 
         foreach ($cart as $eventId => $details) {
-            $event = Event::findOrFail($eventId);
+            $seats = Seat::with('section')->whereIn('id', $details['seats'])->where('is_taken', false)->get();
 
-            // Verificar disponibilidad de boletos
-            if ($details['quantity'] > $event->available_tickets) {
-                return redirect()->route('cart.index')->with('error', 'No hay suficientes boletos disponibles.');
+            if ($seats->count() != count($details['seats'])) {
+                return redirect()->route('cart.index')->with('error', 'Algunos asientos ya no están disponibles.');
             }
 
-            // Reducir boletos disponibles
-            $event->place->max_capacity -= $details['quantity'];
-            $event->place->save();
+            foreach ($seats as $seat) {
+                $seat->is_taken = true;
+                $seat->save();
+            }
 
-            // Generar boleto
             Ticket::create([
                 'user_id' => Auth::id(),
                 'event_id' => $eventId,
-                'quantity' => $details['quantity'],
-                'amount_paid' => $details['price'] * $details['quantity'],
+                'quantity' => $seats->count(),
+                'amount_paid' => $seats->sum(fn($s) => $s->section->price),
                 'status' => 'Activo'
             ]);
         }
 
-        // Limpiar carrito
         Session::forget('cart');
 
         return redirect()->route('tickets.index')->with('success', 'Pago realizado con éxito. Tus boletos han sido generados.');
